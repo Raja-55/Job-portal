@@ -15,6 +15,11 @@ import AdminJobs from "./components/admin/AdminJobs";
 import PostJob from './components/admin/PostJob'
 import Applicants from './components/admin/Applicants'
 import ProtectedRoute from './components/admin/ProtectedRoute'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUser } from './redux/authSlice'
+import axios from 'axios'
+import { USER_API_END_POINT } from './utils/constant'
 
 
 const Layout = () => (
@@ -49,6 +54,32 @@ const appRouter = createBrowserRouter([
   }
 ])
 function App() {
+  const dispatch = useDispatch();
+  const { user } = useSelector(store => store.auth);
+
+  // Check user persistence on app load
+  useEffect(() => {
+    const verifyUser = async () => {
+      try {
+        // Try to fetch user profile - if token is valid, user is authenticated
+        const res = await axios.get(`${USER_API_END_POINT}/profile`, {
+          withCredentials: true
+        });
+        if (res.data.success) {
+          dispatch(setUser(res.data.user));
+        }
+      } catch (error) {
+        // Token invalid or expired, clear user
+        console.log("User not authenticated");
+        dispatch(setUser(null));
+      }
+    };
+    
+    // Only verify if Redux doesn't already have user info from storage
+    if (!user) {
+      verifyUser();
+    }
+  }, [dispatch, user]);
 
   return (
     <RouterProvider router={appRouter} />

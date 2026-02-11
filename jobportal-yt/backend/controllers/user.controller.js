@@ -48,6 +48,10 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      message: "Failed to register user.",
+      success: false,
+    });
   }
 };
 
@@ -191,5 +195,32 @@ export const updateProfile = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      message: "Failed to update profile.",
+      success: false,
+    });
+  }
+};
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    const userId = req.id; // from isAuthenticated middleware
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found.",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      user,
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Failed to fetch user.",
+      success: false,
+    });
   }
 };
