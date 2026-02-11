@@ -15,10 +15,12 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+// parse cookies
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 const corsOptions = {
-    origin: 'https://career-pathyt.netlify.app',
-    credentials: true,
+  origin: "https://career-pathyt.netlify.app",
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -33,12 +35,12 @@ const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB and start the server
 connectDB()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running at port ${PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.error("Failed to connect to MongoDB:", error);
-        process.exit(1); // Exit the process with failure
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running at port ${PORT}`);
     });
+  })
+  .catch((error) => {
+    console.error("Failed to connect to MongoDB:", error);
+    process.exit(1); // Exit the process with failure
+  });
