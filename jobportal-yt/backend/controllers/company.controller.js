@@ -4,6 +4,9 @@ import cloudinary from "../utils/cloudinary.js";
 
 export const registerCompany = async (req, res) => {
   try {
+    console.log("→ Register company request");
+    console.log("Authenticated user ID:", req.id);
+
     const { companyName } = req.body;
     if (!companyName) {
       return res.status(400).json({
@@ -23,6 +26,7 @@ export const registerCompany = async (req, res) => {
       userId: req.id,
     });
 
+    console.log("✓ Company created:", company._id);
     return res.status(201).json({
       message: "Company registered successfully.",
       company,

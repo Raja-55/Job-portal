@@ -94,6 +94,9 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
+    console.log("✓ Login successful, setting cookie for user:", user._id);
+    console.log("Token:", token.substring(0, 20) + "...");
+
     user = {
       _id: user._id,
       fullname: user.fullname,

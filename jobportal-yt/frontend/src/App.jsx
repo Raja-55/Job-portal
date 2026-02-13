@@ -57,20 +57,28 @@ function App() {
   const dispatch = useDispatch();
   const { user } = useSelector(store => store.auth);
 
+  // Setup axios default configs
+  useEffect(() => {
+    axios.defaults.withCredentials = true;
+    console.log("✓ Axios configured with credentials");
+  }, []);
+
   // Check user persistence on app load
   useEffect(() => {
     const verifyUser = async () => {
       try {
+        console.log("→ Verifying user session...");
         // Try to fetch user profile - if token is valid, user is authenticated
         const res = await axios.get(`${USER_API_END_POINT}/profile`, {
           withCredentials: true
         });
         if (res.data.success) {
+          console.log("✓ User verified:", res.data.user._id);
           dispatch(setUser(res.data.user));
         }
       } catch (error) {
         // Token invalid or expired, clear user
-        console.log("User not authenticated");
+        console.log("❌ User verification failed:", error.response?.status);
         dispatch(setUser(null));
       }
     };
