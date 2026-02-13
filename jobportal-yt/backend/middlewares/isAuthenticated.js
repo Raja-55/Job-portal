@@ -2,19 +2,27 @@ import jwt from "jsonwebtoken";
 
 const isAuthenticated = async (req, res, next) => {
   try {
-    // Log incoming request info
     console.log("=== Auth Middleware ===");
     console.log("Path:", req.path);
-    console.log("Cookies received:", req.cookies);
-    console.log("Headers:", req.headers);
 
-    const token = req.cookies?.token;
+    // Check both cookie (for local) and Authorization header (for cross-site)
+    let token = req.cookies?.token;
+
+    // Check Authorization header as fallback
     if (!token) {
-      console.log("❌ NO TOKEN FOUND");
-      return res.status(401).json({
-        message: "User not authenticated",
-        success: false,
-      });
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.substring(7); // Remove "Bearer " prefix
+        console.log("✓ Token found in Authorization header");
+      }
+    } else {
+      console.log("✓ Token found in cookies");
+    }
+
+    if (!token) {
+      console.log("❌ NO TOKEN FOUND in cookies or headers");
+      console.log("Cookies:", req.cookies);
+      console.log("Auth Header:", req.headers.authorization);
     }
 
     console.log("✓ Token found, verifying...");

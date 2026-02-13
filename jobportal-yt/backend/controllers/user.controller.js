@@ -94,8 +94,7 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
-    console.log("✓ Login successful, setting cookie for user:", user._id);
-    console.log("Token:", token.substring(0, 20) + "...");
+    console.log("✓ Login successful, token created for user:", user._id);
 
     user = {
       _id: user._id,
@@ -117,6 +116,7 @@ export const login = async (req, res) => {
       .json({
         message: `Welcome back ${user.fullname}`,
         user,
+        token,
         success: true,
       });
   } catch (error) {

@@ -57,11 +57,25 @@ function App() {
   const dispatch = useDispatch();
   const { user } = useSelector(store => store.auth);
 
-  // Setup axios default configs
+  // Setup axios default configs and auth header
   useEffect(() => {
     axios.defaults.withCredentials = true;
-    console.log("✓ Axios configured with credentials");
-  }, []);
+    
+    // Restore token from localStorage if it exists
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      console.log("✓ Auth header restored from localStorage");
+    }
+    
+    // Set Authorization header if user is logged in
+    if (user && token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      console.log("✓ Auth header set with token");
+    } else if (!token) {
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  }, [user]);
 
   // Check user persistence on app load
   useEffect(() => {
@@ -79,13 +93,19 @@ function App() {
       } catch (error) {
         // Token invalid or expired, clear user
         console.log("❌ User verification failed:", error.response?.status);
+        localStorage.removeItem('token');
+        delete axios.defaults.headers.common["Authorization"];
         dispatch(setUser(null));
       }
     };
     
     // Only verify if Redux doesn't already have user info from storage
     if (!user) {
-      verifyUser();
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Token exists, verify it's still valid
+        verifyUser();
+      }
     }
   }, [dispatch, user]);
 

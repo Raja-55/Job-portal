@@ -36,7 +36,14 @@ const Login = () => {
                 withCredentials: true,
             });
             if (res.data.success) {
+                // Store token in localStorage AND redux
+                localStorage.setItem('token', res.data.token);
+                
                 dispatch(setUser(res.data.user));
+                
+                // Set Authorization header for all future requests
+                axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+                
                 navigate("/");
                 toast.success(res.data.message);
             }
